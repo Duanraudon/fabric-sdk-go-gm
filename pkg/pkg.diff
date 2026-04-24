@@ -1,0 +1,789 @@
+diff --git a/pkg/client/common/discovery/greylist/greylist_test.go b/pkg/client/common/discovery/greylist/greylist_test.go
+index 721a4440..9299b449 100644
+--- a/pkg/client/common/discovery/greylist/greylist_test.go
++++ b/pkg/client/common/discovery/greylist/greylist_test.go
+@@ -58,7 +58,8 @@ func connectionFailedStatus(url string) error {
+ func createMockPeers(fromIndex int, toIndex int) []fab.Peer {
+ 	var mockPeers []fab.Peer
+ 	for i := fromIndex; i < toIndex; i++ {
+-		mockPeers = append(mockPeers, mocks.NewMockPeer("testPeer"+string(i),
++		//mockPeers = append(mockPeers, mocks.NewMockPeer("testPeer"+string(i),
++                mockPeers = append(mockPeers, mocks.NewMockPeer("testPeer"+strconv.Itoa(i),
+ 			"grpcs://myPeer.org:"+strconv.Itoa(i)))
+ 	}
+ 	return mockPeers
+diff --git a/pkg/client/common/verifier/signature.go b/pkg/client/common/verifier/signature.go
+index 57a9b6de..172ab412 100644
+--- a/pkg/client/common/verifier/signature.go
++++ b/pkg/client/common/verifier/signature.go
+@@ -8,9 +8,9 @@ SPDX-License-Identifier: Apache-2.0
+ package verifier
+ 
+ import (
+-	"crypto/x509"
+ 	"time"
+ 
++	"github.com/Duanraudon/cryptogm/x509"
+ 	"github.com/hyperledger/fabric-protos-go/common"
+ 	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/common/errors/status"
+ 	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/common/logging"
+diff --git a/pkg/client/msp/client.go b/pkg/client/msp/client.go
+index bcab6195..4a7f1d0d 100644
+--- a/pkg/client/msp/client.go
++++ b/pkg/client/msp/client.go
+@@ -335,6 +335,9 @@ func (c *Client) Enroll(enrollmentID string, opts ...EnrollmentOption) error {
+ 		return err
+ 	}
+ 
++	if eo.csr == nil {
++		return errors.WithMessage(err, "yyyyyyyyyyyyyyyyyyyyy enroll abnormal")
++	}
+ 	req := &mspapi.EnrollmentRequest{
+ 		Name:    enrollmentID,
+ 		Secret:  eo.secret,
+@@ -427,6 +430,7 @@ func (c *Client) Register(request *RegistrationRequest) (string, error) {
+ 		CAName:         request.CAName,
+ 		Secret:         request.Secret,
+ 	}
++        logger.Info("To tigger ca register 11111111111111111111111111")
+ 	return ca.Register(&r)
+ }
+ 
+diff --git a/pkg/common/providers/fab/network.go b/pkg/common/providers/fab/network.go
+index 582fb369..dad55946 100644
+--- a/pkg/common/providers/fab/network.go
++++ b/pkg/common/providers/fab/network.go
+@@ -7,9 +7,9 @@ SPDX-License-Identifier: Apache-2.0
+ package fab
+ 
+ import (
+-	"crypto/x509"
+ 	"time"
+ 
++	"github.com/Duanraudon/cryptogm/x509"
+ 	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/common/errors/retry"
+ )
+ 
+diff --git a/pkg/common/providers/fab/provider.go b/pkg/common/providers/fab/provider.go
+index 0223de09..c5a4bce4 100644
+--- a/pkg/common/providers/fab/provider.go
++++ b/pkg/common/providers/fab/provider.go
+@@ -8,9 +8,9 @@ package fab
+ 
+ import (
+ 	reqContext "context"
+-	"crypto/tls"
+ 	"time"
+ 
++	"github.com/Duanraudon/cryptogm/tls"
+ 	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/common/options"
+ 	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/common/providers/core"
+ 	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/common/providers/msp"
+diff --git a/pkg/common/providers/test/mockfab/mockconfig.go b/pkg/common/providers/test/mockfab/mockconfig.go
+index ffb95cf3..365f4524 100644
+--- a/pkg/common/providers/test/mockfab/mockconfig.go
++++ b/pkg/common/providers/test/mockfab/mockconfig.go
+@@ -7,10 +7,10 @@ SPDX-License-Identifier: Apache-2.0
+ package mockfab
+ 
+ import (
+-	tls "crypto/tls"
+-	x509 "crypto/x509"
+ 	"time"
+ 
++	tls "github.com/Duanraudon/cryptogm/tls"
++	x509 "github.com/Duanraudon/cryptogm/x509"
+ 	"github.com/golang/mock/gomock"
+ 	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/common/providers/fab"
+ 	"github.com/pkg/errors"
+diff --git a/pkg/common/providers/test/mockfab/mockfab.gen.go b/pkg/common/providers/test/mockfab/mockfab.gen.go
+index b0512536..8bff4418 100644
+--- a/pkg/common/providers/test/mockfab/mockfab.gen.go
++++ b/pkg/common/providers/test/mockfab/mockfab.gen.go
+@@ -6,10 +6,10 @@ package mockfab
+ 
+ import (
+ 	context "context"
+-	tls "crypto/tls"
+ 	reflect "reflect"
+ 	time "time"
+ 
++        "github.com/Duanraudon/cryptogm/tls"
+ 	gomock "github.com/golang/mock/gomock"
+ 	fab "github.com/Duanraudon/fabric-sdk-go-gm/pkg/common/providers/fab"
+ 	tls0 "github.com/Duanraudon/fabric-sdk-go-gm/pkg/core/config/comm/tls"
+diff --git a/pkg/core/config/comm/comm.go b/pkg/core/config/comm/comm.go
+index 54ab24ef..673914c9 100644
+--- a/pkg/core/config/comm/comm.go
++++ b/pkg/core/config/comm/comm.go
+@@ -7,9 +7,9 @@ SPDX-License-Identifier: Apache-2.0
+ package comm
+ 
+ import (
+-	"crypto/tls"
++	"github.com/Duanraudon/cryptogm/tls"
+ 
+-	"crypto/x509"
++	"github.com/Duanraudon/cryptogm/x509"
+ 
+ 	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/common/providers/fab"
+ 	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/core/cryptosuite"
+@@ -34,21 +34,32 @@ func TLSConfig(cert *x509.Certificate, serverName string, config fab.EndpointCon
+ // TLSCertHash is a utility method to calculate the SHA256 hash of the configured certificate (for usage in channel headers)
+ func TLSCertHash(config fab.EndpointConfig) ([]byte, error) {
+ 	certs := config.TLSClientCerts()
++
++	hashAlgo := cryptosuite.SecAlgo
++
+ 	if len(certs) == 0 {
+-		return computeHash([]byte(""))
++		return computeHash([]byte(""), hashAlgo)
+ 	}
+ 
+ 	cert := certs[0]
+ 	if len(cert.Certificate) == 0 {
+-		return computeHash([]byte(""))
++		return computeHash([]byte(""), hashAlgo)
+ 	}
+ 
+-	return computeHash(cert.Certificate[0])
++	return computeHash(cert.Certificate[0], hashAlgo)
+ }
+ 
+ //computeHash computes hash for given bytes using underlying cryptosuite default
+-func computeHash(msg []byte) ([]byte, error) {
+-	h, err := cryptosuite.GetDefault().Hash(msg, cryptosuite.GetSHA256Opts())
++func computeHash(msg []byte, hashAlgo string) ([]byte, error) {
++	var h []byte
++	var err error
++
++	if hashAlgo == "SHA2" {
++		h, err = cryptosuite.GetDefault().Hash(msg, cryptosuite.GetSHA256Opts())
++	} else {
++		h, err = cryptosuite.GetDefault().Hash(msg, cryptosuite.GetGMSM3Opts())
++	}
++
+ 	if err != nil {
+ 		return nil, errors.WithMessage(err, "failed to compute tls cert hash")
+ 	}
+diff --git a/pkg/core/config/comm/comm_test.go b/pkg/core/config/comm/comm_test.go
+index d4175462..1cd87c7f 100644
+--- a/pkg/core/config/comm/comm_test.go
++++ b/pkg/core/config/comm/comm_test.go
+@@ -15,11 +15,10 @@ import (
+ 
+ 	"strings"
+ 
+-	"crypto/tls"
+-
+ 	"reflect"
+ 
+-	"crypto/x509"
++        "github.com/Duanraudon/cryptogm/tls"
++	"github.com/Duanraudon/cryptogm/x509"
+ 
+ 	"github.com/golang/mock/gomock"
+ 	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/common/providers/test/mockfab"
+@@ -146,7 +145,9 @@ func TestTlsCertHash(t *testing.T) {
+ 	assert.Nil(t, err)
+ 	// openssl x509 -fingerprint -sha256 -in testdata/server.crt
+ 	// SHA256 Fingerprint=0D:D5:90:B8:A5:0E:A6:04:3E:A8:75:16:BF:77:A8:FE:E7:C5:62:2D:4C:B3:CB:99:12:74:72:2A:D8:BA:B8:92
+-	expectedHash, err := hex.DecodeString("0DD590B8A50EA6043EA87516BF77A8FEE7C5622D4CB3CB991274722AD8BAB892")
++        // expectedHash, err := hex.DecodeString("0DD590B8A50EA6043EA87516BF77A8FEE7C5622D4CB3CB991274722AD8BAB892")
++	// SM3 Fingerprint=68A7EC22DCE16E3CDF0000C4E5BB1C2319612D9D0BF7907A23D72552200BD193
++	expectedHash, err := hex.DecodeString("68A7EC22DCE16E3CDF0000C4E5BB1C2319612D9D0BF7907A23D72552200BD193")
+ 	if err != nil {
+ 		t.Fatalf("Unexpected error decoding cert fingerprint %s", err)
+ 	}
+diff --git a/pkg/core/config/comm/tls/certpool.go b/pkg/core/config/comm/tls/certpool.go
+index 46c3bc31..642e39a6 100644
+--- a/pkg/core/config/comm/tls/certpool.go
++++ b/pkg/core/config/comm/tls/certpool.go
+@@ -7,10 +7,10 @@ SPDX-License-Identifier: Apache-2.0
+ package tls
+ 
+ import (
+-	"crypto/x509"
+ 	"sync"
+ 	"sync/atomic"
+ 
++	"github.com/Duanraudon/cryptogm/x509"
+ 	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/common/logging"
+ )
+ 
+diff --git a/pkg/core/config/comm/tls/certpool_test.go b/pkg/core/config/comm/tls/certpool_test.go
+index 5dc94087..2c7ee816 100644
+--- a/pkg/core/config/comm/tls/certpool_test.go
++++ b/pkg/core/config/comm/tls/certpool_test.go
+@@ -7,13 +7,13 @@ SPDX-License-Identifier: Apache-2.0
+ package tls
+ 
+ import (
+-	"crypto/x509"
+ 	"encoding/pem"
+ 	"errors"
+ 	"strconv"
+ 	"testing"
+ 	"time"
+ 
++        "github.com/Duanraudon/cryptogm/x509"
+ 	"github.com/stretchr/testify/assert"
+ 	"github.com/stretchr/testify/require"
+ )
+diff --git a/pkg/core/config/cryptoutil/cryptoutils.go b/pkg/core/config/cryptoutil/cryptoutils.go
+index c4812081..806e20ef 100644
+--- a/pkg/core/config/cryptoutil/cryptoutils.go
++++ b/pkg/core/config/cryptoutil/cryptoutils.go
+@@ -9,11 +9,12 @@ package cryptoutil
+ import (
+ 	"crypto"
+ 	"crypto/ecdsa"
+-	"crypto/tls"
+-	"crypto/x509"
+ 	"encoding/pem"
+ 	"io"
+ 
++	"github.com/Duanraudon/cryptogm/sm2"
++	"github.com/Duanraudon/cryptogm/tls"
++	"github.com/Duanraudon/cryptogm/x509"
+ 	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/common/logging"
+ 	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/common/providers/core"
+ 	"github.com/pkg/errors"
+@@ -102,7 +103,9 @@ func X509KeyPair(certPEMBlock []byte, pk core.Key, cs core.CryptoSuite) (tls.Cer
+ 
+ 	switch x509Cert.PublicKey.(type) {
+ 	case *ecdsa.PublicKey:
++	case *sm2.PublicKey:
+ 		cert.PrivateKey = &PrivateKey{cs, pk, x509Cert.PublicKey}
++		//cert.PrivateKey = &PrivateKey{cs, pk, &sm2.PublicKey{}}
+ 	default:
+ 		return fail(errors.New("tls: unknown public key algorithm"))
+ 	}
+diff --git a/pkg/core/config/endpoint/endpoint.go b/pkg/core/config/endpoint/endpoint.go
+index b79a7805..30d48639 100644
+--- a/pkg/core/config/endpoint/endpoint.go
++++ b/pkg/core/config/endpoint/endpoint.go
+@@ -7,13 +7,13 @@ SPDX-License-Identifier: Apache-2.0
+ package endpoint
+ 
+ import (
+-	"crypto/x509"
+ 	"encoding/pem"
+ 	"io/ioutil"
+ 	"strings"
+ 
+ 	"regexp"
+ 
++	"github.com/Duanraudon/cryptogm/x509"
+ 	"github.com/pkg/errors"
+ )
+ 
+diff --git a/pkg/core/config/testdata/template/config.yaml b/pkg/core/config/testdata/template/config.yaml
+index bc07ef89..5307a23e 100755
+--- a/pkg/core/config/testdata/template/config.yaml
++++ b/pkg/core/config/testdata/template/config.yaml
+@@ -96,10 +96,10 @@ client:
+     security:
+      enabled: true
+      default:
+-      # provider: "SW"
+-      provider: ""
+-     # hashAlgorithm: "SHA2"
+-     hashAlgorithm: ""
++      provider: "SW"
++      #provider: ""
++      hashAlgorithm: "SHA2"
++      #hashAlgorithm: ""
+      softVerify: true
+      level: 256
+      pin: "somepin"
+@@ -483,4 +483,4 @@ entityMatchers:
+ 
+ #  channel:
+ #    - pattern: ^(sample)(\w*)(channel)$
+-#      mappedName: ch1
+\ No newline at end of file
++#      mappedName: ch1
+diff --git a/pkg/core/cryptosuite/bccsp/sw/cryptosuiteimpl.go b/pkg/core/cryptosuite/bccsp/sw/cryptosuiteimpl.go
+index ae0f9284..d156387d 100644
+--- a/pkg/core/cryptosuite/bccsp/sw/cryptosuiteimpl.go
++++ b/pkg/core/cryptosuite/bccsp/sw/cryptosuiteimpl.go
+@@ -18,6 +18,9 @@ import (
+ 
+ var logger = logging.NewLogger("fabsdk/core")
+ 
++// SWSecAlgo is Security Hash Algo in config file
++var SWSecAlgo string
++
+ //GetSuiteByConfig returns cryptosuite adaptor for bccsp loaded according to given config
+ func GetSuiteByConfig(config core.CryptoSuiteConfig) (core.CryptoSuite, error) {
+ 	// TODO: delete this check?
+@@ -80,6 +83,8 @@ func getOptsByConfig(c core.CryptoSuiteConfig) *bccspSw.SwOpts {
+ 
+ func getEphemeralOpts() *bccspSw.SwOpts {
+ 	opts := &bccspSw.SwOpts{
++		//use SecAlgo in config file
++		//HashFamily: SWSecAlgo,
+ 		HashFamily: "SHA2",
+ 		SecLevel:   256,
+ 		Ephemeral:  false,
+diff --git a/pkg/core/cryptosuite/cryptoconfig_test.go b/pkg/core/cryptosuite/cryptoconfig_test.go
+index 127c02d2..eeabee77 100644
+--- a/pkg/core/cryptosuite/cryptoconfig_test.go
++++ b/pkg/core/cryptosuite/cryptoconfig_test.go
+@@ -33,7 +33,7 @@ func TestEmptyTestFile(t *testing.T) {
+ 
+ 	// Test for defaults
+ 	assert.Equal(t, true, cryptoConfig.IsSecurityEnabled())
+-	assert.Equal(t, "SHA2", cryptoConfig.SecurityAlgorithm())
++        assert.Equal(t, "SHA2", cryptoConfig.SecurityAlgorithm())
+ 	assert.Equal(t, 256, cryptoConfig.SecurityLevel())
+ 	// Note that we transform to lower case in SecurityProvider()
+ 	assert.Equal(t, "sw", cryptoConfig.SecurityProvider())
+diff --git a/pkg/core/cryptosuite/cryptosuite.go b/pkg/core/cryptosuite/cryptosuite.go
+index 574450d3..0c3721a7 100644
+--- a/pkg/core/cryptosuite/cryptosuite.go
++++ b/pkg/core/cryptosuite/cryptosuite.go
+@@ -25,6 +25,9 @@ var initOnce sync.Once
+ var defaultCryptoSuite core.CryptoSuite
+ var initialized int32
+ 
++// SecAlgo  store security ALG for future use
++var SecAlgo string
++
+ func initSuite(defaultSuite core.CryptoSuite) error {
+ 	if defaultSuite == nil {
+ 		return errors.New("attempting to set invalid default suite")
+@@ -60,10 +63,12 @@ func GetDefault() core.CryptoSuite {
+ //SetDefault sets default suite if one is not already set or created
+ //Make sure you set default suite before very first call to GetDefault(),
+ //otherwise this function will return an error
+-func SetDefault(newDefaultSuite core.CryptoSuite) error {
++func SetDefault(newDefaultSuite core.CryptoSuite, secAlgo string) error {
+ 	if atomic.LoadInt32(&initialized) > 0 {
+ 		return errors.New("default crypto suite is already set")
+ 	}
++	SecAlgo = secAlgo
++	sw.SWSecAlgo = secAlgo
+ 	return initSuite(newDefaultSuite)
+ }
+ 
+@@ -78,6 +83,11 @@ func GetSHA256Opts() core.HashOpts {
+ 	return &bccsp.SHA256Opts{}
+ }
+ 
++//GetGMSM3Opts returns options relating to GM SM3.
++func GetGMSM3Opts() core.HashOpts {
++	return &bccsp.SM3Opts{}
++}
++
+ //GetSHAOpts returns options for computing SHA.
+ func GetSHAOpts() core.HashOpts {
+ 	return &bccsp.SHAOpts{}
+diff --git a/pkg/core/cryptosuite/cryptosuite_test.go b/pkg/core/cryptosuite/cryptosuite_test.go
+index 1626b3c7..7a43ace0 100644
+--- a/pkg/core/cryptosuite/cryptosuite_test.go
++++ b/pkg/core/cryptosuite/cryptosuite_test.go
+@@ -49,7 +49,7 @@ func TestGetDefault(t *testing.T) {
+ 	assert.NotEmpty(t, hashbytes, "Supposed to get valid hash from defaultCryptSuite.Hash()")
+ 
+ 	//Now attempt to set default suite
+-	err = SetDefault(nil)
++	err = SetDefault(nil, "SM3")
+ 	assert.NotEmpty(t, err, "supposed to get error when SetDefault() gets called after GetDefault()")
+ 	assert.True(t, err.Error() == setDefAlreadySetErrorMsg, "unexpected error : expected [%s], got [%s]", setDefAlreadySetErrorMsg, err.Error())
+ 
+@@ -58,7 +58,7 @@ func TestGetDefault(t *testing.T) {
+ 	atomic.StoreInt32(&initialized, 0)
+ 
+ 	//Now attempt to set invalid default suite
+-	err = SetDefault(nil)
++	err = SetDefault(nil, "SM3")
+ 	assert.NotEmpty(t, err, "supposed to get error when invalid default suite is set")
+ 	assert.True(t, err.Error() == InvalidDefSuiteSetErrorMsg, "unexpected error : expected [%s], got [%s]", InvalidDefSuiteSetErrorMsg, err.Error())
+ 
+@@ -67,7 +67,7 @@ func TestGetDefault(t *testing.T) {
+ 		t.Fatal("Unable to get default cryptosuite")
+ 	}
+ 
+-	err = SetDefault(s)
++	err = SetDefault(s, "SM3")
+ 	assert.Empty(t, err, "Not supposed to get error when valid default suite is set")
+ 
+ }
+diff --git a/pkg/fab/ccpackager/lifecycle/packager_test.go b/pkg/fab/ccpackager/lifecycle/packager_test.go
+index b1f31f1d..8fccb90a 100644
+--- a/pkg/fab/ccpackager/lifecycle/packager_test.go
++++ b/pkg/fab/ccpackager/lifecycle/packager_test.go
+@@ -64,7 +64,7 @@ func TestNewCCPackageError(t *testing.T) {
+ 
+ 		pkgBytes, err := NewCCPackage(desc)
+ 		require.Error(t, err)
+-		require.Contains(t, err.Error(), "'go list' failed with: can't load package: package invalid is not in GOROOT")
++		require.Contains(t, err.Error(), "package invalid is not in GOROOT")
+ 		require.Empty(t, pkgBytes)
+ 	})
+ 
+diff --git a/pkg/fab/channel/membership/membership.go b/pkg/fab/channel/membership/membership.go
+index be8d2932..82c19b17 100644
+--- a/pkg/fab/channel/membership/membership.go
++++ b/pkg/fab/channel/membership/membership.go
+@@ -7,11 +7,11 @@ SPDX-License-Identifier: Apache-2.0
+ package membership
+ 
+ import (
+-	"crypto/x509"
+ 	"encoding/pem"
+ 
+ 	"strings"
+ 
++	"github.com/Duanraudon/cryptogm/x509"
+ 	"github.com/golang/protobuf/proto"
+ 	mb "github.com/hyperledger/fabric-protos-go/msp"
+ 	"github.com/Duanraudon/fabric-sdk-go-gm/internal/github.com/hyperledger/fabric/msp"
+diff --git a/pkg/fab/channel/membership/membership_test.go b/pkg/fab/channel/membership/membership_test.go
+index 549bfa2a..02323291 100644
+--- a/pkg/fab/channel/membership/membership_test.go
++++ b/pkg/fab/channel/membership/membership_test.go
+@@ -11,7 +11,6 @@ import (
+ 	"crypto/ecdsa"
+ 	"crypto/elliptic"
+ 	"crypto/rand"
+-	"crypto/x509"
+ 	"crypto/x509/pkix"
+ 	"encoding/asn1"
+ 	"encoding/pem"
+@@ -25,6 +24,7 @@ import (
+ 	"testing"
+ 	"time"
+ 
++        "github.com/Duanraudon/cryptogm/x509"
+ 	"github.com/golang/protobuf/proto"
+ 	mb "github.com/hyperledger/fabric-protos-go/msp"
+ 	"github.com/pkg/errors"
+diff --git a/pkg/fab/comm/connection.go b/pkg/fab/comm/connection.go
+index 4391f76d..12464d06 100755
+--- a/pkg/fab/comm/connection.go
++++ b/pkg/fab/comm/connection.go
+@@ -7,11 +7,11 @@ SPDX-License-Identifier: Apache-2.0
+ package comm
+ 
+ import (
+-	"crypto/x509"
+ 	"sync/atomic"
+ 
+ 	"github.com/pkg/errors"
+ 
++	"github.com/Duanraudon/cryptogm/x509"
+ 	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/client/common/verifier"
+ 	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/common/logging"
+ 	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/common/options"
+diff --git a/pkg/fab/comm/connectionopts.go b/pkg/fab/comm/connectionopts.go
+index a9740a9b..9459138e 100644
+--- a/pkg/fab/comm/connectionopts.go
++++ b/pkg/fab/comm/connectionopts.go
+@@ -8,9 +8,9 @@ package comm
+ 
+ import (
+ 	"context"
+-	"crypto/x509"
+ 	"time"
+ 
++	"github.com/Duanraudon/cryptogm/x509"
+ 	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/common/options"
+ 	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/common/providers/fab"
+ 	"github.com/spf13/cast"
+diff --git a/pkg/fab/endpointconfig.go b/pkg/fab/endpointconfig.go
+index c2f889ad..e3e054c1 100644
+--- a/pkg/fab/endpointconfig.go
++++ b/pkg/fab/endpointconfig.go
+@@ -7,14 +7,14 @@ SPDX-License-Identifier: Apache-2.0
+ package fab
+ 
+ import (
+-	"crypto/tls"
+-	"crypto/x509"
+ 	"reflect"
+ 	"regexp"
+ 	"strconv"
+ 	"strings"
+ 	"time"
+ 
++	"github.com/Duanraudon/cryptogm/tls"
++	"github.com/Duanraudon/cryptogm/x509"
+ 	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/common/errors/multi"
+ 	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/common/errors/retry"
+ 	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/common/errors/status"
+diff --git a/pkg/fab/endpointconfig_test.go b/pkg/fab/endpointconfig_test.go
+index f444dad5..00bcf1f4 100644
+--- a/pkg/fab/endpointconfig_test.go
++++ b/pkg/fab/endpointconfig_test.go
+@@ -7,8 +7,6 @@ SPDX-License-Identifier: Apache-2.0
+ package fab
+ 
+ import (
+-	"crypto/tls"
+-	"crypto/x509"
+ 	"encoding/pem"
+ 	"fmt"
+ 	"os"
+@@ -18,6 +16,8 @@ import (
+ 	"testing"
+ 	"time"
+ 
++        "github.com/Duanraudon/cryptogm/tls"
++	"github.com/Duanraudon/cryptogm/x509"
+ 	"github.com/pkg/errors"
+ 	"github.com/spf13/viper"
+ 	"github.com/stretchr/testify/assert"
+diff --git a/pkg/fab/events/endpoint/endpoint.go b/pkg/fab/events/endpoint/endpoint.go
+index 70e6086f..d3414f13 100644
+--- a/pkg/fab/events/endpoint/endpoint.go
++++ b/pkg/fab/events/endpoint/endpoint.go
+@@ -7,8 +7,7 @@ SPDX-License-Identifier: Apache-2.0
+ package endpoint
+ 
+ import (
+-	"crypto/x509"
+-
++	"github.com/Duanraudon/cryptogm/x509"
+ 	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/common/options"
+ 	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/common/providers/fab"
+ 	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/fab/comm"
+diff --git a/pkg/fab/mocks/mockconfig.go b/pkg/fab/mocks/mockconfig.go
+index 3f319342..1855a47e 100644
+--- a/pkg/fab/mocks/mockconfig.go
++++ b/pkg/fab/mocks/mockconfig.go
+@@ -7,15 +7,15 @@ SPDX-License-Identifier: Apache-2.0
+ package mocks
+ 
+ import (
+-	"crypto/tls"
+ 	"path/filepath"
+ 	"time"
+ 
++	"github.com/Duanraudon/cryptogm/tls"
+ 	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/common/providers/core"
+ 	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/core/config/endpoint"
+ 	"github.com/Duanraudon/fabric-sdk-go-gm/test/metadata"
+ 
+-	"crypto/x509"
++	"github.com/Duanraudon/cryptogm/x509"
+ 
+ 	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/common/providers/fab"
+ 	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/common/providers/msp"
+diff --git a/pkg/fab/opts.go b/pkg/fab/opts.go
+index b7d518f8..acc9df26 100644
+--- a/pkg/fab/opts.go
++++ b/pkg/fab/opts.go
+@@ -7,9 +7,9 @@ SPDX-License-Identifier: Apache-2.0
+ package fab
+ 
+ import (
+-	"crypto/tls"
+ 	"time"
+ 
++	"github.com/Duanraudon/cryptogm/tls"
+ 	"github.com/pkg/errors"
+ 
+ 	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/common/providers/fab"
+diff --git a/pkg/fab/opts_test.go b/pkg/fab/opts_test.go
+index 676d518b..c5e6792e 100644
+--- a/pkg/fab/opts_test.go
++++ b/pkg/fab/opts_test.go
+@@ -7,10 +7,10 @@ SPDX-License-Identifier: Apache-2.0
+ package fab
+ 
+ import (
+-	"crypto/tls"
+ 	"testing"
+ 	"time"
+ 
++        "github.com/Duanraudon/cryptogm/tls"
+ 	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/common/providers/fab"
+ 	commtls "github.com/Duanraudon/fabric-sdk-go-gm/pkg/core/config/comm/tls"
+ )
+diff --git a/pkg/fab/orderer/orderer.go b/pkg/fab/orderer/orderer.go
+index 4e5d6176..2c423f83 100644
+--- a/pkg/fab/orderer/orderer.go
++++ b/pkg/fab/orderer/orderer.go
+@@ -8,10 +8,10 @@ package orderer
+ 
+ import (
+ 	reqContext "context"
+-	"crypto/x509"
+ 	"io"
+ 	"time"
+ 
++	"github.com/Duanraudon/cryptogm/x509"
+ 	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/common/errors/multi"
+ 	"github.com/pkg/errors"
+ 	"github.com/spf13/cast"
+diff --git a/pkg/fab/orderer/orderer_test.go b/pkg/fab/orderer/orderer_test.go
+index b9bfa1fa..78455370 100644
+--- a/pkg/fab/orderer/orderer_test.go
++++ b/pkg/fab/orderer/orderer_test.go
+@@ -8,13 +8,13 @@ package orderer
+ 
+ import (
+ 	reqContext "context"
+-	"crypto/x509"
+ 	"os"
+ 	"path/filepath"
+ 	"strings"
+ 	"testing"
+ 	"time"
+ 
++        "github.com/Duanraudon/cryptogm/x509"
+ 	"google.golang.org/grpc"
+ 	grpccodes "google.golang.org/grpc/codes"
+ 
+diff --git a/pkg/fab/peer/peer.go b/pkg/fab/peer/peer.go
+index daba015f..246f1bf0 100644
+--- a/pkg/fab/peer/peer.go
++++ b/pkg/fab/peer/peer.go
+@@ -9,7 +9,7 @@ package peer
+ import (
+ 	reqContext "context"
+ 
+-	"crypto/x509"
++	"github.com/Duanraudon/cryptogm/x509"
+ 
+ 	"github.com/spf13/cast"
+ 	"google.golang.org/grpc"
+diff --git a/pkg/fab/peer/peerendorser.go b/pkg/fab/peer/peerendorser.go
+index 742a13e3..1bc8b7ed 100644
+--- a/pkg/fab/peer/peerendorser.go
++++ b/pkg/fab/peer/peerendorser.go
+@@ -8,10 +8,10 @@ package peer
+ 
+ import (
+ 	reqContext "context"
+-	"crypto/x509"
+ 	"regexp"
+ 	"time"
+ 
++	"github.com/Duanraudon/cryptogm/x509"
+ 	"github.com/pkg/errors"
+ 
+ 	"google.golang.org/grpc"
+diff --git a/pkg/fab/peer/peerendorser_test.go b/pkg/fab/peer/peerendorser_test.go
+index d5b97232..120a143a 100644
+--- a/pkg/fab/peer/peerendorser_test.go
++++ b/pkg/fab/peer/peerendorser_test.go
+@@ -8,12 +8,12 @@ package peer
+ 
+ import (
+ 	reqContext "context"
+-	"crypto/x509"
+ 	"fmt"
+ 	"reflect"
+ 	"testing"
+ 	"time"
+ 
++        "github.com/Duanraudon/cryptogm/x509"
+ 	"github.com/golang/mock/gomock"
+ 	pb "github.com/hyperledger/fabric-protos-go/peer"
+ 	"github.com/stretchr/testify/assert"
+diff --git a/pkg/fab/signingmgr/signingmgr.go b/pkg/fab/signingmgr/signingmgr.go
+index 29054cb4..08053491 100644
+--- a/pkg/fab/signingmgr/signingmgr.go
++++ b/pkg/fab/signingmgr/signingmgr.go
+@@ -25,7 +25,11 @@ type SigningManager struct {
+ // @param {Config} config - configuration provider
+ // @returns {SigningManager} new signing manager
+ func New(cryptoProvider core.CryptoSuite) (*SigningManager, error) {
+-	return &SigningManager{cryptoProvider: cryptoProvider, hashOpts: cryptosuite.GetSHAOpts()}, nil
++	if cryptosuite.SecAlgo == "SHA2" {
++		return &SigningManager{cryptoProvider: cryptoProvider, hashOpts: cryptosuite.GetSHAOpts()}, nil
++	}
++
++	return &SigningManager{cryptoProvider: cryptoProvider, hashOpts: cryptosuite.GetGMSM3Opts()}, nil
+ }
+ 
+ // Sign will sign the given object using provided key
+diff --git a/pkg/fab/txn/env.go b/pkg/fab/txn/env.go
+index 15a624ce..ad31f6da 100644
+--- a/pkg/fab/txn/env.go
++++ b/pkg/fab/txn/env.go
+@@ -19,6 +19,7 @@ import (
+ 	pb "github.com/hyperledger/fabric-protos-go/peer"
+ 	"github.com/Duanraudon/fabric-sdk-go-gm/internal/github.com/hyperledger/fabric/common/crypto"
+ 	contextApi "github.com/Duanraudon/fabric-sdk-go-gm/pkg/common/providers/context"
++	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/common/providers/core"
+ 	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/common/providers/fab"
+ 	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/core/cryptosuite"
+ )
+@@ -55,6 +56,7 @@ func (th *TransactionHeader) ChannelID() string {
+ // metadata to create transaction proposals.
+ func NewHeader(ctx contextApi.Client, channelID string, opts ...fab.TxnHeaderOpt) (*TransactionHeader, error) {
+ 	var options fab.TxnHeaderOptions
++	var ho core.HashOpts
+ 	for _, opt := range opts {
+ 		opt(&options)
+ 	}
+@@ -78,7 +80,12 @@ func NewHeader(ctx contextApi.Client, channelID string, opts ...fab.TxnHeaderOpt
+ 		}
+ 	}
+ 
+-	ho := cryptosuite.GetSHA256Opts() // TODO: make configurable
++	if cryptosuite.SecAlgo == "SHA2" {
++		ho = cryptosuite.GetSHA256Opts()
++	} else {
++		ho = cryptosuite.GetGMSM3Opts()
++	}
++
+ 	h, err := ctx.CryptoSuite().GetHash(ho)
+ 	if err != nil {
+ 		return nil, errors.WithMessage(err, "hash function creation failed")
+diff --git a/pkg/fabsdk/fabsdk.go b/pkg/fabsdk/fabsdk.go
+index fcdcf44a..f3abbadf 100644
+--- a/pkg/fabsdk/fabsdk.go
++++ b/pkg/fabsdk/fabsdk.go
+@@ -399,7 +399,7 @@ func (sdk *FabricSDK) initializeCryptoSuite(cryptoSuiteConfig core.CryptoSuiteCo
+ 
+ 	// Setting this cryptosuite as the factory default
+ 	if !cryptosuite.DefaultInitialized() {
+-		err = cryptosuite.SetDefault(sdk.cryptoSuite)
++		err = cryptosuite.SetDefault(sdk.cryptoSuite, cryptoSuiteConfig.SecurityAlgorithm())
+ 		if err != nil {
+ 			return errors.WithMessage(err, "failed to set default crypto suite")
+ 		}
+diff --git a/pkg/msp/caclient.go b/pkg/msp/caclient.go
+index 5f3005eb..3c6e13bd 100644
+--- a/pkg/msp/caclient.go
++++ b/pkg/msp/caclient.go
+@@ -334,6 +334,7 @@ func (c *CAClientImpl) Register(request *api.RegistrationRequest) (string, error
+ 		return "", errors.New("request.Name is required")
+ 	}
+ 
++	logger.Info("To trigger Register aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+ 	registrar, err := c.getRegistrar(c.registrar.EnrollID, c.registrar.EnrollSecret)
+ 	if err != nil {
+ 		return "", err
+@@ -501,6 +502,7 @@ func (c *CAClientImpl) getRegistrar(enrollID string, enrollSecret string) (msp.S
+ 		}
+ 
+ 		// Attempt to enroll the registrar
++		logger.Info("To trigger enroll yyyyyyyyyyyyyyyyyyyyyyyyyyyyy")
+ 		err = c.Enroll(&api.EnrollmentRequest{Name: enrollID, Secret: enrollSecret})
+ 		if err != nil {
+ 			return nil, err
+diff --git a/pkg/msp/identityconfig.go b/pkg/msp/identityconfig.go
+index 1855dc9e..3ab2a85c 100644
+--- a/pkg/msp/identityconfig.go
++++ b/pkg/msp/identityconfig.go
+@@ -7,12 +7,12 @@ SPDX-License-Identifier: Apache-2.0
+ package msp
+ 
+ import (
+-	"crypto/x509"
+ 	"encoding/pem"
+ 	"fmt"
+ 	"strconv"
+ 	"strings"
+ 
++	"github.com/Duanraudon/cryptogm/x509"
+ 	commtls "github.com/Duanraudon/fabric-sdk-go-gm/pkg/core/config/comm/tls"
+ 
+ 	"github.com/pkg/errors"
