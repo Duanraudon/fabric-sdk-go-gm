@@ -61,4 +61,4 @@ require (
 	google.golang.org/genproto v0.0.0-20190819201941-24fa4b261c55 // indirect
 )
 
-replace google.golang.org/grpc => ./google.golang.org/grpc
+replace google.golang.org/grpc => github.com/Duanraudon/grpc v1.0.0

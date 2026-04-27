@@ -1394,8 +1394,7 @@ func (c *EndpointConfig) loadTLSClientCerts(configEntity *endpointConfigEntity) 
 	var clientCerts tls.Certificate
 	cb := configEntity.Client.TLSCerts.Client.Cert.Bytes()
 	if len(cb) == 0 {
-		// if no cert found in the config, empty cert chain should be used
-		c.tlsClientCerts = []tls.Certificate{clientCerts}
+		c.tlsClientCerts = []tls.Certificate{}
 		return nil
 	}
 
