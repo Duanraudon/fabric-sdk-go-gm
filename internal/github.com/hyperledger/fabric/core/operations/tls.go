@@ -45,16 +45,20 @@ func (t TLS) Config() (*tls.Config, error) {
 			caCertPool.AppendCertsFromPEM(caPem)
 		}
 
+		var gmUsed bool
 		if cryptosuite.SecAlgo == "SHA2" {
 			cfgCipherSuites = comm.DefaultTLSCipherSuites
+			gmUsed = false
 		} else {
 			cfgCipherSuites = comm.DefaultGMTLSCipherSuites
+			gmUsed = true
 		}
 
 		tlsConfig = &tls.Config{
 			Certificates: []tls.Certificate{cert},
 			CipherSuites: cfgCipherSuites,
 			ClientCAs:    caCertPool,
+			GMUsed:       gmUsed,
 		}
 		if t.ClientCertRequired {
 			tlsConfig.ClientAuth = tls.RequireAndVerifyClientCert

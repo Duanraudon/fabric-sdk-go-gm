@@ -9,7 +9,7 @@ module github.com/Duanraudon/fabric-sdk-go-gm
 
 //https://github.com/Duanraudon/fabric-sdk-go-gm.git
 
-go 1.20
+go 1.21.0
 
 require (
 	github.com/Duanraudon/cryptogm v1.0.3
@@ -17,7 +17,7 @@ require (
 	github.com/cloudflare/cfssl v1.4.1
 	github.com/go-kit/kit v0.8.0
 	github.com/golang/mock v1.4.3
-	github.com/golang/protobuf v1.3.3
+	github.com/golang/protobuf v1.4.2
 	github.com/hyperledger/fabric-config v0.0.5
 	github.com/hyperledger/fabric-lib-go v1.0.0
 	github.com/hyperledger/fabric-protos-go v0.0.0-20200707132912-fee30f3ccd23
@@ -28,9 +28,11 @@ require (
 	github.com/spf13/cast v1.3.1
 	github.com/spf13/viper v1.1.1
 	github.com/stretchr/testify v1.5.1
-	golang.org/x/crypto v0.0.0-20220919173607-35f4265a4bc0
-	golang.org/x/net v0.0.0-20211112202133-69e39bad7dc2
-	google.golang.org/grpc v1.29.1
+	github.com/tjfoc/gmsm v1.4.0
+	github.com/tjfoc/gmtls v1.2.1
+	golang.org/x/crypto v0.19.0
+	golang.org/x/net v0.10.0
+	google.golang.org/grpc v1.31.0
 	gopkg.in/yaml.v2 v2.3.0
 )
 
@@ -56,9 +58,14 @@ require (
 	github.com/weppos/publicsuffix-go v0.5.0 // indirect
 	github.com/zmap/zcrypto v0.0.0-20190729165852-9051775e6a2e // indirect
 	github.com/zmap/zlint v0.0.0-20190806154020-fd021b4cfbeb // indirect
-	golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1 // indirect
-	golang.org/x/text v0.3.6 // indirect
+	golang.org/x/sys v0.17.0 // indirect
+	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/genproto v0.0.0-20190819201941-24fa4b261c55 // indirect
+	google.golang.org/protobuf v1.23.0 // indirect
 )
 
+replace github.com/tjfoc/gmsm => github.com/chenxifun/gmsm v1.4.0
+
 replace google.golang.org/grpc => github.com/Duanraudon/grpc v1.0.0
+
+replace github.com/tjfoc/gmtls => github.com/chenxifun/gmtls v1.2.1-0.20210427064604-124283070ca7

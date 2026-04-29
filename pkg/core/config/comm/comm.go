@@ -11,6 +11,7 @@ import (
 
 	"github.com/Duanraudon/cryptogm/x509"
 
+	"github.com/Duanraudon/fabric-sdk-go-gm/internal/github.com/hyperledger/fabric/sdkinternal/pkg/comm"
 	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/common/providers/fab"
 	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/core/cryptosuite"
 	"github.com/pkg/errors"
@@ -28,7 +29,25 @@ func TLSConfig(cert *x509.Certificate, serverName string, config fab.EndpointCon
 	if err != nil {
 		return nil, err
 	}
-	return &tls.Config{RootCAs: certPool, Certificates: config.TLSClientCerts(), ServerName: serverName}, nil
+
+	// 根据密码算法选择 CipherSuites 和 GMUsed 标志
+	var cfgCipherSuites []uint16
+	var gmUsed bool
+	if cryptosuite.SecAlgo == "SHA2" {
+		cfgCipherSuites = comm.DefaultTLSCipherSuites
+		gmUsed = false
+	} else {
+		cfgCipherSuites = comm.DefaultGMTLSCipherSuites
+		gmUsed = true
+	}
+
+	return &tls.Config{
+		RootCAs:      certPool,
+		Certificates: config.TLSClientCerts(),
+		ServerName:   serverName,
+		CipherSuites: cfgCipherSuites,
+		GMUsed:       gmUsed,
+	}, nil
 }
 
 // TLSCertHash is a utility method to calculate the SHA256 hash of the configured certificate (for usage in channel headers)

@@ -44,8 +44,8 @@ var (
 		tls.TLS_RSA_WITH_AES_256_GCM_SHA384,
 	}
 	// strong GM TLS cipher suites
-	//tls.GMTLS_ECDHE_SM2_WITH_SM4_SM3,
 	DefaultGMTLSCipherSuites = []uint16{
+		tls.GMTLS_ECDHE_SM2_WITH_SM4_SM3,
 		tls.GMTLS_SM2_WITH_SM4_SM3,
 	}
 	// default connection timeout

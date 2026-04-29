@@ -13,20 +13,19 @@ import (
 
 	"github.com/Duanraudon/cryptogm/x509"
 	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/common/errors/multi"
+	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/client/common/verifier"
 	"github.com/pkg/errors"
 	"github.com/spf13/cast"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/keepalive"
 	grpcstatus "google.golang.org/grpc/status"
 
-	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/client/common/verifier"
 	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/common/errors/status"
 	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/common/logging"
 	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/common/providers/fab"
 	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/context"
-	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/core/config/comm"
 	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/core/config/endpoint"
+	"github.com/Duanraudon/fabric-sdk-go-gm/pkg/core/tlscomm"
 	"github.com/hyperledger/fabric-protos-go/common"
 	ab "github.com/hyperledger/fabric-protos-go/orderer"
 )
@@ -76,16 +75,11 @@ func New(config fab.EndpointConfig, opts ...Option) (*Orderer, error) {
 	}
 	grpcOpts = append(grpcOpts, grpc.WithDefaultCallOptions(grpc.WaitForReady(!orderer.failFast)))
 	if endpoint.AttemptSecured(orderer.url, orderer.allowInsecure) {
-		//tls config
-		tlsConfig, err := comm.TLSConfig(orderer.tlsCACert, orderer.serverName, config)
+		tc, err := tlscomm.NewTransportCredentials(orderer.tlsCACert, orderer.serverName, config)
 		if err != nil {
 			return nil, err
 		}
-		tlsConfig.VerifyPeerCertificate = func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
-			return verifier.VerifyPeerCertificate(rawCerts, verifiedChains)
-		}
-
-		grpcOpts = append(grpcOpts, grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig)))
+		grpcOpts = append(grpcOpts, grpc.WithTransportCredentials(tc))
 	} else {
 		grpcOpts = append(grpcOpts, grpc.WithInsecure())
 	}
